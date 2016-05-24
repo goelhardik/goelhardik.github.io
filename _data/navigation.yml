@@ -1,0 +1,16 @@
+# Site navigation links
+
+- title: About
+  url: /about/
+
+- title: Research
+  url: /research/
+
+- title: Projects 
+  url: /projects/
+
+- title: Blog
+  url: /blog/
+
+- title: Search
+  url: /search/

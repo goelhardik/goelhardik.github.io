@@ -6,10 +6,11 @@ highlighter:      pygments
 permalink:        pretty
 
 # Setup
-title:            Hyde
-tagline:          'A Jekyll theme'
-description:      'A brazen two-column <a href="http://jekyllrb.com" target="_blank">Jekyll</a> theme that pairs a prominent sidebar with uncomplicated content. Made by <a href="https://twitter.com/mdo" target="_blank">@mdo</a>.'
-url:              http://hyde.getpoole.com
+title:            Hardik Goel
+tagline:          'Computer Scientist | Graduate Student'
+description:      'Computer Scientist & Graduate Student <br /><br />
+    <a href="https://github.com/goelhardik" target="_blank">github</a>.<a href="https://twitter.com/virtualbaba" target="_blank">twitter</a>.<a href="https://www.facebook.com/hardik.goel.549" target="_blank">facebook</a>'
+url:              http://github.com/goelhardik
 baseurl:          /
 
 author:
@@ -24,4 +25,4 @@ paginate_path: "page:num"
 version:          2.1.0
 
 github:
-  repo:           https://github.com/poole/hyde
+  repo:           https://github.com/goelhardik

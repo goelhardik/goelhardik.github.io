@@ -1,30 +1,34 @@
 ---
 layout: page
-title: About
+title: About Me
 ---
 
 <p class="message">
-  Hey there! This page is included as an example. Feel free to customize it for your own use upon downloading. Carry on!
+  I am a second year <strong>Computer Science</strong> MS student, working with <a href="http://www-users.cs.umn.edu/~banerjee/">Professor Arindam Banerjee</a> at the <a href="https://twin-cities.umn.edu/">University of Minnesota,     Twin Cities</a>.
+My interests lie in the fields of <strong>Machine Learning & Artificial Intelligence</strong>.
+<br />
+Currently, I am exploring Deep Learning techniques on aviation data for flight safety.
 </p>
 
-In the novel, *The Strange Case of Dr. Jeykll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
 
-There are currently two themes built on Poole:
+## Bio:
 
-* [Hyde](http://hyde.getpoole.com)
-* [Lanyon](http://lanyon.getpoole.com)
+<strong>[University of Minnesota, Twin Cities](https://twin-cities.umn.edu/)</strong> *(Sep 2015 - Present)*
+<br /><i>MS, Computer Science</i>
+<li>I am working here towards building a system for the detection of precursors to anomalous flight events. This is a NASA project intended to be deployed in real-time systems to predict anomalous events and enhance flight safety. Currently, we are exploring [LSTM](https://en.wikipedia.org/wiki/Long_short-term_memory)s as a potential method to detect precursors.</li>
+<li>I was also the Teaching Assistant for [CSci 4061](http://www-users.cselabs.umn.edu/classes/Spring-2016/csci4061/) - Introduction to Operating Systems, for Spring 2016. I designed projects, conducted recitations and held office hours for questions on the material.</li>
 
-Learn more and contribute on [GitHub](https://github.com/poole).
+<strong>[Cisco Systems, Bangalore](http://www.cisco.com)</strong> *(Jul 2011 - Aug 2015)*
+<br /><i>Firmware Engineer</i>
+<li>I worked on the firmware for a Converged Network Adapter that goes into Cisco's data center solution called the <a href="http://www.cisco.com/c/en/us/products/servers-unified-computing/index.html">UCS</a></li>
+<li>Programmed a lot of C</li>
+<li>Gained familiarity with Linux kernel and low-level programming</li>
 
-## Setup
+<strong>[Indian Institute of Technology, Roorkee](http://www.iitr.ac.in/)</strong> *(Jul 2007 - May 2011)*
+<br /><i>BTech, Electronics & Communication Engineering</i>
+<li>I worked a bit on [image processing]()</li>
+<li>Met some awesome people</li>
+<li>Played a lot of guitar; <a href="https://www.youtube.com/user/hardikiitr/videos">youtube channel</a>!</li>
 
-Some fun facts about the setup of this project include:
-
-* Built for [Jekyll](http://jekyllrb.com)
-* Developed on GitHub and hosted for free on [GitHub Pages](https://pages.github.com)
-* Coded with [Sublime Text 2](http://sublimetext.com), an amazing code editor
-* Designed and developed while listening to music like [Blood Bros Trilogy](https://soundcloud.com/maddecent/sets/blood-bros-series)
-
-Have questions or suggestions? Feel free to [open an issue on GitHub](https://github.com/poole/issues/new) or [ask me on Twitter](https://twitter.com/mdo).
-
-Thanks for reading!
+<br />
+Head over to the [Projects](/projects) page to check out some of the stuff I have done!

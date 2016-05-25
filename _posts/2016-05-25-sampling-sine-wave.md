@@ -29,7 +29,7 @@ We will use these modules to get our work done.
 Next, we set our range for the *x-axis* and define our functions.
 
 {% highlight python %}
-xlim = 40                                                                                                                                                                              
+xlim = 40
 
 # define functions
 x = np.arange(0, xlim, 0.1)

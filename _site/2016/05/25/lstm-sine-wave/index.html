@@ -11,7 +11,7 @@
 
   <title>
     
-      Hardik Goel &middot; Computer Scientist | Graduate Student
+      Learning to predict a mathematical function using LSTM &middot; Hardik Goel
     
   </title>
 
@@ -44,7 +44,7 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a class="sidebar-nav-item active" href="/">Home</a>
+      <a class="sidebar-nav-item" href="/">Home</a>
 
       
 
@@ -78,95 +78,10 @@
 
 
     <div class="content container">
-      <div class="posts">
-  
-  <div class="post">
-    <h1 class="post-title">
-      <a href="/2016/05/25/sampling-sine-wave/">
-        Generating and visualizing data from a sine wave in Python
-      </a>
-    </h1>
-
-    <span class="post-date">25 May 2016</span>
-
-    <div class="message">
-    This blog post shows how to generate sequential data by sampling a sine wave (or any other kind of mathematical function). I did this in Python and found a cool way to visualize the data as it is generated.
-</div>
-
-<p>So the objective here is to generate sequential data from a mathematical function - a <em>sine wave</em> is used in this post. Also, the goal is to use Python to do this. We are going to sample a sine wave at a pre-defined interval and dump it to a file for future use in other Python scripts.</p>
-
-<p>Starting with the imports:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pylab</span>
-<span class="kn">import</span> <span class="nn">pickle</span></code></pre></figure>
-
-<p>We will use these modules to get our work done.</p>
-
-<ul>
-<li><strong>matplotlib.pyplot</strong> to plot and visualize the data</li>
-<li><strong>numpy</strong> to generate the mathematical function</li>
-<li><strong>pylab</strong> to help with interactive plots</li>
-<li><strong>pickle</strong> to dump the data into a file for future use</li>
-</ul>
-
-<p>Next, we set our range for the <em>x-axis</em> and define our functions.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xlim</span> <span class="o">=</span> <span class="mi">40</span>
-
-<span class="c"># define functions</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code></pre></figure>
-
-<p>This will generate two lists <code>x</code> and <code>y</code> with our <em>x-axis</em> and <em>y-axis</em> data.</p>
-
-<p>We&#39;ll now dump the <em>y-axis</em> data into our file for future use.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># write the data out to a file</span>
-<span class="n">sinedata</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;sinedata.md&#39;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
-<span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sinedata</span><span class="p">)</span>
-<span class="n">sinedata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
-
-<p>The above snippet writes the data of <code>y</code> into a file named <em>sinedata.md</em>. Pickle is specific to Python and it can be used to load the data into another Python script later.</p>
-
-<p>Next, we will visualize the data. Here is the code to do this:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># interactive mode on</span>
-<span class="n">pylab</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
-
-<span class="c"># set the data limits</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">xlim</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="c"># plot the first 200 points in the data</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">])</span>
-<span class="c"># plot the remaining data incrementally</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.0005</span><span class="p">)</span> 
-
-<span class="c"># hold the plot until terminated</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span></code></pre></figure>
-
-<p>I think the comments in the snippet do a good job at the explanation.
-The plot will look something like this:</p>
-
-<p><img src="/images/optimised.gif" alt="placeholder" title="Sine wave data"></p>
-
-  </div>
-  
-  <div class="post">
-    <h1 class="post-title">
-      <a href="/2016/05/25/lstm-sine-wave/">
-        Learning to predict a mathematical function using LSTM
-      </a>
-    </h1>
-
-    <span class="post-date">25 May 2016</span>
-
-    <div class="message">
+      <div class="post">
+  <h1 class="post-title">Learning to predict a mathematical function using LSTM</h1>
+  <span class="post-date">25 May 2016</span>
+  <div class="message">
     <strong>Long Short-Term Memory (LSTM)</strong> is an RNN architecture that is used to learn time-series data over long intervals. Read more about it <a href="https://en.wikipedia.org/wiki/Long_short-term_memory">here</a> and <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">here</a>.
 <br />
     In this blog post, I'll share how I used an LSTM model to learn a <i>sine wave</i> over time and then how I used this model to generate a sine-wave on its own.
@@ -265,18 +180,24 @@ There is only 1 output unit. So given the last 50 sine wave samples at a distanc
 
 <p>A possible explanation for these observations is that the sine-wave is pretty easy to learn. If the network knows the last ~20 values, it can predict what the next value should be. This optimal sequence length should be higher for more complex functions. Also the number of hidden units of ~15, seems to be good for learning to model a sine-wave.</p>
 
-  </div>
-  
 </div>
 
-<div class="pagination">
-  
-    <span class="pagination-item older">Older</span>
-  
-  
-    <span class="pagination-item newer">Newer</span>
-  
+<div class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/05/25/sampling-sine-wave/">
+            Generating and visualizing data from a sine wave in Python
+            <small>25 May 2016</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
 </div>
+
     </div>
 
   </body>

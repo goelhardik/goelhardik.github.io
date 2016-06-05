@@ -179,4 +179,4 @@ This is what we get.
 
 The autoencoder does a rather good job at learning encodings and reconstructing the digits from them. The last row shows the 32 dimensional encoding learned for each of the ten test images (in a 4x8 sized image).
 
-Find the entire working code for this autoencoder in Lasagne on my [github](https://github.com/goelhardik).
+Find the entire working code for this autoencoder in Lasagne on my [github](https://github.com/goelhardik/autoencoder-lasagne).

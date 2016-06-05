@@ -4,7 +4,7 @@
  <title>Hardik Goel</title>
  <link href="http://github.com/goelhardik/atom.xml" rel="self"/>
  <link href="http://github.com/goelhardik/"/>
- <updated>2016-06-05T01:56:19-05:00</updated>
+ <updated>2016-06-05T01:58:36-05:00</updated>
  <id>http://github.com/goelhardik</id>
  <author>
    <name>Mark Otto</name>
@@ -181,7 +181,7 @@ Now we will plot the images and visualize the results.&lt;/p&gt;
 
 &lt;p&gt;The autoencoder does a rather good job at learning encodings and reconstructing the digits from them. The last row shows the 32 dimensional encoding learned for each of the ten test images (in a 4x8 sized image).&lt;/p&gt;
 
-&lt;p&gt;Find the entire working code for this autoencoder in Lasagne on my &lt;a href=&quot;https://github.com/goelhardik&quot;&gt;github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Find the entire working code for this autoencoder in Lasagne on my &lt;a href=&quot;https://github.com/goelhardik/autoencoder-lasagne&quot;&gt;github&lt;/a&gt;.&lt;/p&gt;
 </content>
  </entry>
  

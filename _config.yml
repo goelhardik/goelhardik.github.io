@@ -18,7 +18,7 @@ author:
   name:           'Mark Otto'
   url:            https://twitter.com/mdo
 
-gems: [jekyll-paginate]
+gems: [jekyll-paginate, jekyll/scholar]
 paginate:         5
 paginate_path: "page:num"
 
@@ -27,3 +27,31 @@ version:          2.1.0
 
 github:
   repo:           https://github.com/goelhardik
+
+scholar:
+  style: apa
+  locale: en
+
+  sort_by: none
+  order: ascending
+
+  group_by: none
+  group_order: ascending
+
+  source: ./_bibliography/
+  bibliography: references.bib
+  bibliography_template: "{{reference}}"
+
+  replace_strings: true
+  join_strings:    true
+
+  use_raw_bibtex_entry: true
+  bibtex_filters:
+  - superscript
+  - latex
+
+  details_dir:    bibliography
+  details_layout: bibtex.html
+  details_link:   Details
+
+  query: "@*"

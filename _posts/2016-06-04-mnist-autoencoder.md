@@ -1,6 +1,8 @@
 ---
 layout: post
+comments: true
 title: Building autoencoders in Lasagne
+message: <img src="../images/mnist_ae_single_layer.png" height="256" width="512"/>
 ---
 
 

@@ -1,6 +1,8 @@
 ---
 layout: post
+comments: true
 title: Generating and visualizing data from a sine wave in Python 
+message: <img src="../images/optimised.gif" height="256" width="512"/>
 ---
 
 

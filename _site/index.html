@@ -77,7 +77,7 @@
       <a class="sidebar-nav-item" href="https://github.com/goelhardik">Projects</a>
     </nav>
 
-    <p>&copy; 2016. All rights reserved.</p>
+	<!--<p>&copy; 2016. All rights reserved.</p>-->
   </div>
 </div>
 
@@ -92,174 +92,10 @@
       </a>
     </h1>
 
-    <span class="post-date">04 Jun 2016</span>
-
-    <div class="message">
-    <strong>Autoencoders</strong> are a data-compression model. They can be used to encode a given input into a representation of smaller dimension. A decoder can then be used to reconstruct the input back from the encoded version. In this blog post, I will share how I built an autoencoder in the library <strong>Lasagne</strong>. I will use the MNIST dataset for illustration.
-</div>
-
-<p>Autoencoders are generally used in unsupervised data learning settings. When we have unlabeled data, we can use an autoencoder to learn an internal, low-dimensional representation of the input data. The model does not need output labels, rather the output is supposed to be the reconstruction of the input data itself. The errors are propagated back and slowly we can expect the model to learn a well encoded representation of the input data.</p>
-
-<h2>A simple autoencoder</h2>
-
-<p>Let&#39;s build a simple model with an input layer, a hidden (encoded) layer and an output layer.</p>
-
-<p>First, let&#39;s get done with the imports and define model parameters.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span> 
-<span class="kn">import</span> <span class="nn">pylab</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">theano</span>
-<span class="kn">import</span> <span class="nn">lasagne</span>
-
-<span class="n">MODEL_FILE</span> <span class="o">=</span> <span class="s">&#39;mnist.state_ae.model.lasagne&#39;</span>    <span class="c"># File to store the learned model</span>
-
-<span class="n">N_ENCODED</span> <span class="o">=</span> <span class="mi">32</span>    <span class="c"># Size of encoded representation</span>
-<span class="n">NUM_EPOCHS</span> <span class="o">=</span> <span class="mi">50</span>   <span class="c"># Number of epochs to train the net</span>
-<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c"># Batch Size</span>
-<span class="n">NUM_FEATURES</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span> <span class="c"># Input feature size</span></code></pre></figure>
-
-<p>Next, define a function to generate batches of data.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">gen_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="n">BATCH_SIZE</span><span class="p">):</span>
-
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span><span class="n">NUM_FEATURES</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
-        <span class="n">x</span><span class="p">[</span><span class="n">n</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span>
-
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span></code></pre></figure>
-
-<p>Build the network:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">build_network</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Building network ...&quot;</span><span class="p">)</span>
-       
-    <span class="c"># Define the layers </span>
-    <span class="n">l_in</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">InputLayer</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">NUM_FEATURES</span><span class="p">))</span>
-    <span class="n">encoder_l_out</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">DenseLayer</span><span class="p">(</span><span class="n">l_in</span><span class="p">,</span>
-                                    <span class="n">num_units</span><span class="o">=</span><span class="n">N_ENCODED</span><span class="p">,</span>
-                                    <span class="n">W</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">Normal</span><span class="p">(),</span>
-                                    <span class="n">nonlinearity</span><span class="o">=</span><span class="n">lasagne</span><span class="o">.</span><span class="n">nonlinearities</span><span class="o">.</span><span class="n">rectify</span><span class="p">)</span>
-    <span class="n">decoder_l_out</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">DenseLayer</span><span class="p">(</span><span class="n">encoder_l_out</span><span class="p">,</span>
-                                    <span class="n">num_units</span> <span class="o">=</span> <span class="n">NUM_FEATURES</span><span class="p">,</span>
-                                    <span class="n">W</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">Normal</span><span class="p">(),</span>
-                                    <span class="n">nonlinearity</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">nonlinearities</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">)</span>
-    
-    <span class="c"># Define some Theano variables</span>
-    <span class="n">target_values</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">fmatrix</span><span class="p">(</span><span class="s">&#39;target_output&#39;</span><span class="p">)</span>
-    <span class="n">encoded_output</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">encoder_l_out</span><span class="p">)</span>
-    <span class="n">network_output</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">decoder_l_out</span><span class="p">)</span>
-    
-    <span class="n">cost</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">objectives</span><span class="o">.</span><span class="n">squared_error</span><span class="p">(</span><span class="n">network_output</span><span class="p">,</span><span class="n">target_values</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="n">all_params</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">get_all_params</span><span class="p">(</span><span class="n">decoder_l_out</span><span class="p">,</span><span class="n">trainable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    
-    <span class="c"># Compute AdaDelta updates for training</span>
-    <span class="n">updates</span> <span class="o">=</span> <span class="n">lasagne</span><span class="o">.</span><span class="n">updates</span><span class="o">.</span><span class="n">adadelta</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">all_params</span><span class="p">)</span>
-    
-    <span class="c"># Some Theano functions </span>
-    <span class="n">train</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">([</span><span class="n">l_in</span><span class="o">.</span><span class="n">input_var</span><span class="p">,</span> <span class="n">target_values</span><span class="p">],</span>
-                            <span class="n">cost</span><span class="p">,</span>
-                            <span class="n">updates</span><span class="o">=</span><span class="n">updates</span><span class="p">,</span>
-                            <span class="n">allow_input_downcast</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">predict</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">([</span><span class="n">l_in</span><span class="o">.</span><span class="n">input_var</span><span class="p">],</span>
-                                <span class="n">network_output</span><span class="p">,</span>
-                                <span class="n">allow_input_downcast</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">encode</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">([</span><span class="n">l_in</span><span class="o">.</span><span class="n">input_var</span><span class="p">],</span>
-                                <span class="n">encoded_output</span><span class="p">,</span>
-                                <span class="n">allow_input_downcast</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">train</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">encode</span></code></pre></figure>
-
-<p>Now, we will use the above model. I have the MNIST dataset dumped in a file using <code>pickle</code>. 
-The data is normalized to be between 0 and 1, and reshaped to be of shape (784, ) from the original (1, 28, 28).
-After loading the dataset into train and test variables, we proceed to train the model.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">state_ae</span>
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="c"># Load the dataset</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Loading data...&quot;</span><span class="p">)</span>
-
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;x_train.mnist&#39;</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span>
-    <span class="n">x_train</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;x_test.mnist&#39;</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span>
-    <span class="n">x_test</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="n">trainfunc</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">encode</span> <span class="o">=</span> <span class="n">state_ae</span><span class="o">.</span><span class="n">build_network</span><span class="p">()</span>
-    <span class="n">learn</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">trainfunc</span><span class="p">,</span> <span class="n">x_test</span><span class="p">)</span>
-    <span class="n">check_model</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">encode</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">trainfunc</span><span class="p">,</span> <span class="n">x_test</span><span class="p">):</span>
-
-    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">state_ae</span><span class="o">.</span><span class="n">NUM_EPOCHS</span><span class="p">):</span>
-
-        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span> 
-        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span> 
-        <span class="n">avg_cost</span> <span class="o">=</span> <span class="mi">0</span> 
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">state_ae</span><span class="o">.</span><span class="n">gen_data</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">avg_cost</span> <span class="o">+=</span> <span class="n">trainfunc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_train</span><span class="p">)):</span>
-                <span class="k">break</span>
-
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Epoch {} average loss = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">avg_cost</span> <span class="o">/</span> <span class="n">count</span><span class="p">))</span></code></pre></figure>
-
-<p>We train the network for 50 epochs. After that it seems to reach a reasonably good error of 0.023.
-Now we will plot the images and visualize the results.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">check_model</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">encode</span><span class="p">):</span>
-
-    <span class="n">encoded_imgs</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="n">x_test</span><span class="p">[:,</span> <span class="p">:])</span>
-    <span class="n">decoded_imgs</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">x_test</span><span class="p">[:,</span> <span class="p">:])</span>
-
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-
-    <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c"># how many digits we will display</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-        <span class="c"># display original</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">gray</span><span class="p">()</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Original images&quot;</span><span class="p">)</span>
-
-        <span class="c"># display reconstruction</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">decoded_imgs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">gray</span><span class="p">()</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Reconstructed images&quot;</span><span class="p">)</span>
-
-        <span class="c"># display encodings</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">encoded_imgs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">gray</span><span class="p">()</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Encoded images&quot;</span><span class="p">)</span>
-
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></figure>
-
-<p>This is what we get.</p>
-
-<p><img src="/images/mnist_ae_single_layer.png" alt="placeholder" title="MNIST Autoencoder results"></p>
-
-<p>The autoencoder does a rather good job at learning encodings and reconstructing the digits from them. The last row shows the 32 dimensional encoding learned for each of the ten test images (in a 4x8 sized image).</p>
-
-<p>Find the entire working code for this autoencoder in Lasagne on my <a href="https://github.com/goelhardik/autoencoder-lasagne">github</a>.</p>
-
+    <span class="post-date">04 Jun 2016 &#9642;
+		<a href="http://goelhardik.github.io/2016/06/04/mnist-autoencoder/#disqus_thread">0 Comments</a></span>
+    <img src="../images/mnist_ae_single_layer.png" height="256" width="512"/>
+	<a href="/2016/06/04/mnist-autoencoder/">Read more...</a>
   </div>
   
   <div class="post">
@@ -269,74 +105,10 @@ Now we will plot the images and visualize the results.</p>
       </a>
     </h1>
 
-    <span class="post-date">25 May 2016</span>
-
-    <div class="message">
-    This blog post shows how to generate sequential data by sampling a sine wave (or any other kind of mathematical function). I did this in Python and found a cool way to visualize the data as it is generated.
-</div>
-
-<p>So the objective here is to generate sequential data from a mathematical function - a <em>sine wave</em> is used in this post. Also, the goal is to use Python to do this. We are going to sample a sine wave at a pre-defined interval and dump it to a file for future use in other Python scripts.</p>
-
-<p>Starting with the imports:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pylab</span>
-<span class="kn">import</span> <span class="nn">pickle</span></code></pre></figure>
-
-<p>We will use these modules to get our work done.</p>
-
-<ul>
-<li><strong>matplotlib.pyplot</strong> to plot and visualize the data</li>
-<li><strong>numpy</strong> to generate the mathematical function</li>
-<li><strong>pylab</strong> to help with interactive plots</li>
-<li><strong>pickle</strong> to dump the data into a file for future use</li>
-</ul>
-
-<p>Next, we set our range for the <em>x-axis</em> and define our functions.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">xlim</span> <span class="o">=</span> <span class="mi">40</span>
-
-<span class="c"># define functions</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code></pre></figure>
-
-<p>This will generate two lists <code>x</code> and <code>y</code> with our <em>x-axis</em> and <em>y-axis</em> data.</p>
-
-<p>We&#39;ll now dump the <em>y-axis</em> data into our file for future use.</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># write the data out to a file</span>
-<span class="n">sinedata</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;sinedata.md&#39;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
-<span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sinedata</span><span class="p">)</span>
-<span class="n">sinedata</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
-
-<p>The above snippet writes the data of <code>y</code> into a file named <em>sinedata.md</em>. Pickle is specific to Python and it can be used to load the data into another Python script later.</p>
-
-<p>Next, we will visualize the data. Here is the code to do this:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># interactive mode on</span>
-<span class="n">pylab</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
-
-<span class="c"># set the data limits</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">xlim</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="c"># plot the first 200 points in the data</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">])</span>
-<span class="c"># plot the remaining data incrementally</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.0005</span><span class="p">)</span> 
-
-<span class="c"># hold the plot until terminated</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span></code></pre></figure>
-
-<p>I think the comments in the snippet do a good job at the explanation.
-The plot will look something like this:</p>
-
-<p><img src="/images/optimised.gif" alt="placeholder" title="Sine wave data"></p>
-
+    <span class="post-date">25 May 2016 &#9642;
+		<a href="http://goelhardik.github.io/2016/05/25/sampling-sine-wave/#disqus_thread">0 Comments</a></span>
+    <img src="../images/optimised.gif" height="256" width="512"/>
+	<a href="/2016/05/25/sampling-sine-wave/">Read more...</a>
   </div>
   
   <div class="post">
@@ -346,107 +118,10 @@ The plot will look something like this:</p>
       </a>
     </h1>
 
-    <span class="post-date">25 May 2016</span>
-
-    <div class="message">
-    <strong>Long Short-Term Memory (LSTM)</strong> is an RNN architecture that is used to learn time-series data over long intervals. Read more about it <a href="https://en.wikipedia.org/wiki/Long_short-term_memory">here</a> and <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">here</a>.
-<br />
-    In this blog post, I'll share how I used an LSTM model to learn a <i>sine wave</i> over time and then how I used this model to generate a sine-wave on its own.
-</div>
-
-<p>In my <a href="/2016/05/25/sampling-sine-wave/">previous post</a>, I shared how I used Python to generate sequential and periodic data from a sine wave. I dumped this data into a file called <em>sinedata.md</em> last time, and we are going to use that dump in this post.</p>
-
-<p>For the LSTM, I have used the library called <a href="https://github.com/Lasagne">Lasagne</a>. It is a great library for easily setting up deep learning models. Also, they provide some <a href="https://github.com/Lasagne/Recipes">&quot;Recipes&quot;</a> for quick setup. I have used the LSTM model they provided for text generation and modified it to suit my needs for learning a sine-wave. So I will only share the relevant code in this post to avoid the clutter.</p>
-
-<p>First we&#39;ll use <em>pickle</em> to load the data that was generated earlier:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">in_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;sinedata.md&#39;</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span>
-<span class="n">in_text</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">in_file</span><span class="p">)</span></code></pre></figure>
-
-<p>The parameters used for the LSTM are as below:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Sequence Length</span>
-<span class="n">SEQ_LENGTH</span> <span class="o">=</span> <span class="mi">50</span>
-
-<span class="c"># Number of units in the two hidden (LSTM) layers</span>
-<span class="n">N_HIDDEN</span> <span class="o">=</span> <span class="mi">32</span>
-
-<span class="c"># Optimization learning rate</span>
-<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="o">.</span><span class="mo">01</span>
-
-<span class="c"># All gradients above this will be clipped</span>
-<span class="n">GRAD_CLIP</span> <span class="o">=</span> <span class="mi">100</span>
-
-<span class="c"># How often should we check the output?</span>
-<span class="n">PRINT_FREQ</span> <span class="o">=</span> <span class="mi">10</span>
-
-<span class="c"># Number of epochs to train the net</span>
-<span class="n">NUM_EPOCHS</span> <span class="o">=</span> <span class="mi">50</span>
-
-<span class="c"># Batch Size</span>
-<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span></code></pre></figure>
-
-<p>The LSTM architecture contains just 1 hidden layer with a <code>tanh</code> non-linearity. The output layer has <code>linear</code> non-linearity.
-There is only 1 output unit. So given the last 50 sine wave samples at a distance of 0.1 <em>x-units</em> each, our network will learn to predict the 51st point. Then given the last 49 samples from the data and the generated sample as the 50th sample, our network will predict the 51st sample once again. It will keep doing this, moving forward in time, for ~200 time steps in our case.</p>
-
-<p>So, for this experiment, I have generated sine-wave data for <code>x</code> ranging from 0 to 2000 at a gap of 0.1. I train the LSTM on this data.</p>
-
-<p>The gif below shows what the network predicted after each training iteration.</p>
-
-<p><img src="/images/sine-wave-prediction.gif" alt="placeholder" title="Sine wave predicted"></p>
-
-<p>Some things to note:</p>
-
-<blockquote>
-<ul>
-<li>The network does not take much time to train; probably because of the <em>sequence length</em> of 50 and 32 <em>hidden units</em></li>
-<li>The prediction is almost perfect</li>
-<li>The network can be trained using continuous data and also to predict continuous data</li>
-</ul>
-</blockquote>
-
-<p>Let us track the variation of training time and number of required epochs with change in sequence length. The target training error is <code>&lt; 0.0001</code>.</p>
-
-<p><em>Time Taken</em> vs <em>Sequence Length</em></p>
-
-<p><img src="/images/time-vs-seq.png" alt="placeholder" title="TrainingTime vs SeqLen"></p>
-
-<p><em>Number of Epochs</em> vs <em>Sequence Length</em></p>
-
-<p><img src="/images/epocs-vs-seq.png" alt="placeholder" title="Epochs vs SeqLen"></p>
-
-<p>Some things to note:</p>
-
-<blockquote>
-<ul>
-<li>Sequence length of 20 seems to be enough for training error of the order of 0.0001 </li>
-<li>Time taken increases as sequence length goes beyond 20, which is expected because of the increased complexity of the model </li>
-<li>Number of epochs remains the same more or less, for sequence length beyond 20</li>
-</ul>
-</blockquote>
-
-<p>Let us now track the variation of training time and number of required epochs with change in the number of units in the hidden layer of the LSTM. The target training error is again <code>&lt; 0.0001</code>.</p>
-
-<p><em>Time Taken</em> vs <em># Hidden Units</em></p>
-
-<p><img src="/images/times-vs-nhid.png" alt="placeholder" title="TrainingTime vs #Hidden"></p>
-
-<p><em>Number of Epochs</em> vs <em># Hidden Units</em></p>
-
-<p><img src="/images/epochs-vs-nhid.png" alt="placeholder" title="Epochs vs #Hidden"></p>
-
-<p>Some things to note:</p>
-
-<blockquote>
-<ul>
-<li>~15 seems to be a reasonable number of hidden units for training error of the order of 0.0001 </li>
-<li>Time taken increases as number of hidden untis goes beyond 15, which is expected because of the increased complexity of the model </li>
-<li>Number of epochs remains the same more or less </li>
-</ul>
-</blockquote>
-
-<p>A possible explanation for these observations is that the sine-wave is pretty easy to learn. If the network knows the last ~20 values, it can predict what the next value should be. This optimal sequence length should be higher for more complex functions. Also the number of hidden units of ~15, seems to be good for learning to model a sine-wave.</p>
-
+    <span class="post-date">25 May 2016 &#9642;
+		<a href="http://goelhardik.github.io/2016/05/25/lstm-sine-wave/#disqus_thread">0 Comments</a></span>
+    <img src="../images/sine-wave-prediction.gif" height="256" width="512"/>
+	<a href="/2016/05/25/lstm-sine-wave/">Read more...</a>
   </div>
   
 </div>
@@ -459,7 +134,9 @@ There is only 1 output unit. So given the last 50 sine wave samples at a distanc
     <span class="pagination-item newer">Newer</span>
   
 </div>
+
     </div>
 
+	<script id="dsq-count-scr" src="//http-goelhardik-github-io.disqus.com/count.js" async></script>
   </body>
 </html>

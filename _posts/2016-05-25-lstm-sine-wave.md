@@ -1,6 +1,8 @@
 ---
 layout: post
+comments: true
 title: Learning to predict a mathematical function using LSTM 
+message: <img src="../images/sine-wave-prediction.gif" height="256" width="512"/>
 ---
 
 

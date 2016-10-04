@@ -85,7 +85,7 @@ html {
 
 /* Sidebar nav */
 .sidebar-nav {
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
 }
 .sidebar-nav-item {
   display: block;
@@ -107,10 +107,10 @@ a.sidebar-nav-item:focus {
 
 @media (min-width: 48em) {
   .sidebar-sticky {
-    position: absolute;
     right:  1rem;
-    bottom: 0rem;
+    bottom: 1rem;
     left:   1rem;
+	height: 100%;
   }
 }
 

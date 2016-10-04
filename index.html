@@ -12,9 +12,10 @@ title: Home
       </a>
     </h1>
 
-    <span class="post-date">{{ post.date | date_to_string }}</span>
-
-    {{ post.content }}
+    <span class="post-date">{{ post.date | date_to_string }} &#9642;
+		<a href="http://goelhardik.github.io{{ post.url }}#disqus_thread">0 Comments</a></span>
+    {{ post.message }}
+	<a href="{{ post.url }}">Read more...</a>
   </div>
   {% endfor %}
 </div>
